@@ -2,7 +2,8 @@ from scrapingproject.scrapingproject.spiders import ourfirstbot
 from scrapy.crawler import CrawlerProcess
 import pandas as pd
 import csv
-import word_cloud
+from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
 
 
 def read_df(df):
@@ -44,6 +45,31 @@ def split_df(df):
             split_output = df[(df['rating'] >= i) and (df['rating'] <= float(i + 1))]
         split_list.append(split_output)
     return split_list
+
+
+def word_cloud(df):
+    comment_words = ''
+    stopwords = set(STOPWORDS)
+
+    for val in df:
+        val = str(val)
+        tokens = val.split()
+        for i in range(len(tokens)):
+            tokens[i] = tokens[i].lower()
+        comment_words += " ".join(tokens) + " "
+
+    wordcloud = WordCloud(width=800, height=800,
+                          background_color='white',
+                          stopwords=stopwords,
+                          min_font_size=10).generate(comment_words)
+
+    # plot the WordCloud image
+    plt.figure(figsize=(8, 8), facecolor=None)
+    plt.imshow(wordcloud)
+    plt.axis("off")
+    plt.tight_layout(pad=0)
+
+    plt.show()
 
 
 process = CrawlerProcess({'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 ' \
